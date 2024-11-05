@@ -1,4 +1,4 @@
-$ttl 86400
+$TTL 86400
 @       IN      SOA main.com hostmaster.main.com. (
                     202 ; Serial
                     600 ; Refresh

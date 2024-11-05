@@ -1,26 +1,16 @@
 Résumé de la Configuration Nginx
+Cette configuration Nginx met en œuvre un système de limitation de débit pour contrôler le flux des requêtes entrantes sur le serveur. Les points clés de cette configuration sont les suivants :
 
-Cette configuration Nginx est conçue pour optimiser la gestion des requêtes HTTP en intégrant un système de mise en cache, ainsi qu'un proxy pour rediriger les requêtes vers des serveurs de backend. Voici les éléments clés de la configuration :
-
-1. Mise en Cache
-Chemin de Cache : Les fichiers de cache sont stockés dans le répertoire /var/cache/nginx.
-Zone de Cache : Une zone de cache nommée NginxCache est définie, avec une taille de 20 Mo en mémoire pour indexer les clés.
-Expiration : Les éléments du cache inactifs pendant plus de 60 minutes seront supprimés.
-Structure des Répertoires : Les fichiers de cache sont organisés avec 1 niveau et 2 sous-répertoires.
-Taille Maximale : La taille totale du cache est limitée à 10 Go.
-2. Gestion des Serveurs
-Upstream Server : Un groupe de serveurs upstream appelé demo redirige le trafic vers un serveur de backend écoutant sur le port 8000.
-3. Configuration du Serveur Principal
-Port d'Écoute : Le serveur écoute sur le port 80.
-Proxy Pass : Les requêtes à la racine (/) sont redirigées vers le groupe de serveurs demo, avec gestion des en-têtes X-Forwarded-For et Host pour préserver les informations d'origine.
-Mise en Cache : Le cache est activé pour la localisation principale, avec des règles définissant la validité des réponses en fonction des codes de statut HTTP (200 et 400).
-Fichiers Statiques : Une localisation dédiée pour servir des fichiers statiques à partir du répertoire local /home/app/staticfiles/.
-Localisation Spécifique (/p1) : Une autre localisation est configurée pour gérer des requêtes spécifiques, désactivant le cache et permettant un contournement conditionnel.
-4. Services Docker
-Cette configuration fait également partie d'une architecture Docker qui inclut :
-
-Service Web : Un service web construit une application Django, exposée sur le port 8000 et liée à un volume pour la gestion des fichiers statiques.
-Service Nginx : Le service Nginx est construit à partir d'un contexte spécifique et expose le port 80 pour le trafic entrant.
-Service DNS : Un service DNS est configuré avec des ports pour les requêtes UDP et TCP.
-Conclusion
-Cette configuration Nginx permet d'améliorer les performances des applications web en utilisant le caching et en dirigeant efficacement le trafic vers les serveurs appropriés, tout en intégrant des éléments de Docker pour une orchestration facile des services.
+Zone de Limitation de Requête :
+La directive limit_req_zone $binary_remote_addr zone=limitbyaddr:10m rate=1r/s; définit une zone de limitation basée sur l'adresse IP des clients (représentée par $binary_remote_addr). Cette zone, nommée limitbyaddr, alloue 10 Mo de mémoire pour stocker les informations de limitation et limite chaque client à 1 requête par seconde.
+État de Limitation :
+La directive limit_req_status 429; spécifie que lorsqu'un client dépasse la limite de requêtes, le serveur renvoie un code d'erreur HTTP 429 (Trop de requêtes).
+Serveur Upstream :
+Le bloc upstream demo définit un groupe de serveurs, ici nommé demo, qui redirige les requêtes vers un serveur backend écoutant sur le port 8000.
+Configuration du Serveur :
+Le serveur écoute sur le port 80 et applique la limitation de requêtes avec limit_req zone=limitbyaddr burst=10 delay=5;. Cela permet un maximum de 10 requêtes à la fois, avec un délai de 5 secondes avant que les requêtes supplémentaires ne soient traitées.
+Gestion des Requêtes :
+Dans la localisation racine (location /), les requêtes sont proxy-passées au groupe de serveurs demo, en ajoutant les en-têtes nécessaires pour la traçabilité de la requête (X-Forwarded-For et Host).
+La localisation /static/ est configurée pour servir des fichiers statiques depuis le chemin /home/app/staticfiles/.
+Utilité de cette Configuration
+Cette configuration est essentielle pour améliorer la résilience du serveur contre les abus et les attaques par déni de service (DoS) en limitant le nombre de requêtes qu'un client peut envoyer dans un laps de temps donné. Cela aide à préserver les ressources du serveur et à assurer une expérience utilisateur optimale en évitant la surcharge du backend. De plus, la gestion des fichiers statiques permet de décharger le serveur d'applications en servant efficacement le contenu statique.
