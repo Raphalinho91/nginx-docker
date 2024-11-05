@@ -1,10 +1,9 @@
 version: '3.8'
 
 services:
-  web: 
+  web1: 
     build: 
       context: ./django/
-    # command: python manage.py runserver 0.0.0.0:8000
     command: gunicorn demo.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - ./django/:/usr/src/app/
@@ -13,6 +12,19 @@ services:
       - 8000
     env_file:
       - ./.env/dev.env
+
+  web2: 
+    build: 
+      context: ./django2/
+    command: gunicorn demo.wsgi:application --bind 0.0.0.0:8080
+    volumes:
+      - ./django2/:/usr/src/app/
+      - static_files:/usr/src/app/staticfiles
+    expose:
+      - 8080
+    env_file:
+      - ./.env/dev.env
+
   nginx:
     build:
       context: ./nginx/
