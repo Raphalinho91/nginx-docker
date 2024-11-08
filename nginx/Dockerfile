@@ -9,4 +9,4 @@ RUN mkdir -p /home/app/staticfiles && \
 
 RUN htpasswd -bc /etc/pwd/.htpasswd yourusername yourpassword
 
-COPY conf.d/ /etc/nginx/conf.d/
+COPY templates/ /etc/nginx/templates/

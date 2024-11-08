@@ -19,9 +19,12 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx/conf.d/:/etc/nginx/conf.d/
+      # - ./nginx/conf.d/:/etc/nginx/conf.d/
+      - ./nginx/templates/:/etc/nginx/templates/
       - static_files:/home/app/staticfiles
-      
+    env_file:
+      - ./.env/dev.env
+
   dns:
     build:
       context: ./dns/
