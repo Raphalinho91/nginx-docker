@@ -5,7 +5,8 @@ RUN apt-get update && \
     apt-get install --no-install-recommends -y apache2-utils
 
 RUN mkdir -p /home/app/staticfiles && \
-    mkdir -p /etc/pwd
+    mkdir -p /etc/pwd && \
+    mkdir -p /home/secure
 
 RUN htpasswd -bc /etc/pwd/.htpasswd yourusername yourpassword
 
