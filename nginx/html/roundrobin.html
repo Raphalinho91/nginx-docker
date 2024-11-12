@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roundrobin</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f5f5f5;
+      }
+      .content {
+        text-align: center;
+      }
+      h1 {
+        font-size: 2rem;
+        color: #333;
+      }
+      p {
+        font-size: 1.2rem;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <h1>Welcome to the Roundrobin Server</h1>
+      <p>Served from port: <span id="port"></span></p>
+    </div>
+
+    <script>
+      // Extract the port from the current URL
+      const port = window.location.port || "default";
+      document.getElementById("port").textContent = port;
+    </script>
+  </body>
+</html>
